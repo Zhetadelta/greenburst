@@ -18,6 +18,7 @@ import threading
 from pika.exceptions import * #StreamLostError, ConnectionResetError
 from dump_all import tel_df_to_es
 from elasticsearch import Elasticsearch
+from slack_send import *
 
 logger = logging.getLogger()
 format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -53,8 +54,10 @@ def stage_initer(values):
 
 def mask_finder(data, sigma):
     y = savgol_filter(data,61, 2)
-    chanel_nos = np.arange(4096)
     mask = (data-y > sigma) | (data-y < -sigma)
+    mask[:10] = True
+    mask[980:1445] = True
+    mask[3518:3560] = True
     return mask
 
 
@@ -107,6 +110,8 @@ def begin_main(values):
         freqs = fil_obj.chan_freqs
         df = mjd2influx(fil_obj.tstart)
         if df is not None:
+            if len(df)  < 33:
+                send_msg_2_slack(f"Pointing info is missing!")
             all_data_valid = df['DATA_VALID'].sum()
             if all_data_valid < 33:
                 logging.info('Less than 33s of data is valid, skipping this file')
@@ -115,6 +120,11 @@ def begin_main(values):
             else:
                 es=Elasticsearch([{'host':'localhost','port':9200}])
                 tel_df_to_es(es,df,filterbank)
+        else:
+            logging.info("Don't know what's going on!")
+            send_msg_2_slack(f"No info from InfluxDB")
+            _cmdline(f'rm {filterbank}')
+            return None
         logging.info(f'{100*all_data_valid/len(df)}% data valid')
         bandpass = fil_obj.bandpass
         chan_nos=np.arange(0,bandpass.shape[0])
@@ -126,7 +136,7 @@ def begin_main(values):
         for chans in bad_chans:
             out_chans.append('-zap_chans')
             out_chans.append(chans)
-            out_chans.append(chans+1)
+            out_chans.append(chans)
 
         
         filterbank_name=filterbank.split('/')[-1].split('.')[0]
@@ -157,7 +167,7 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help='Be verbose')
     parser.add_argument('-d', '--daemon', dest='daemon', action='store_false', help='Run with AMQP')
     parser.add_argument('-n', '--nchans', type=int, help='no. of chans to calc. median over', default=64)
-    parser.add_argument('-s', '--sigma', type=int, help='sigma over which values are tagged as RFI', default=3)
+    parser.add_argument('-s', '--sigma', type=int, help='sigma over which values are tagged as RFI', default=5)
     parser.add_argument('-f', '--file', type=str, help='Filterbank file')
     parser.set_defaults(verbose=False)
     parser.set_defaults(daemon=True)
