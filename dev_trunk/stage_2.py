@@ -53,10 +53,6 @@ def stage_initer(values):
         channel = connection.channel()
 
 
-
-def match_cands(cand_df, influx_df):
-    return _new_cand_df
-
 def begin_main(values):
     cand_lists=[]
     for files in glob.glob(values.files):
@@ -117,8 +113,8 @@ def begin_main(values):
             if len(cand_df_masked) != 0:
                 cmd = f'mkdir -p {base_work_dir}/{folder}/cands'
                 subprocess.run(cmd.split(), stdout=subprocess.PIPE)
-                send2gpuQ(f'candmaker.py -n 10 -c {base_work_dir}/{folder}/{folder}.csv -o {base_work_dir}/{folder}/cands/')
-                send2gpuQ(f'predict.py -n 5 -c {base_work_dir}/{folder}/cands/ -m a')
+                send2gpuQ(f'candmaker.py -n 11 -c {base_work_dir}/{folder}/{folder}.csv -o {base_work_dir}/{folder}/cands/')
+                send2gpuQ(f'predict.py -n 8 -b 64 -c {base_work_dir}/{folder}/cands/ -m a')
 
                 results = pd.read_csv(f'{base_work_dir}/{folder}/cands/results_a.csv')
                 label_mask = (results['label'] == 1)
@@ -145,7 +141,7 @@ if __name__=='__main__':
     parser.add_argument('-d', '--daemon', dest='daemon', action='store_false', help='Run with AMQP')
     parser.add_argument('-s', '--snr', type=int, help='sigma over which values are tagged as RFI', default=8.0)
     parser.add_argument('-w', '--width', type=int, help = 'log 2 width of the candidates', default=7)
-    parser.add_argument('-D', '--dm', type=float, help = 'minimum DM to look out for', default=30)
+    parser.add_argument('-D', '--dm', type=float, help = 'minimum DM to look out for', default=20)
     parser.add_argument('-m', '--members', type=int, help='minimum number of members in the cluster', default=5)
     parser.add_argument('-f', '--files', type=str, help='cand files')
     parser.set_defaults(verbose=False)
