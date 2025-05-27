@@ -91,10 +91,11 @@ def extend_df(influx_df, cand_df, tsec = 3):
             ne2001_dm, ymw16_dm = get_both_dms(cand_df.loc[index,'cand_gl'], cand_df.loc[index,'cand_gb'])
             cand_df.loc[index,'cand_ne2001'] = ne2001_dm
             cand_df.loc[index,'cand_ymw16'] = ymw16_dm
+            cand_df.loc[index,'cand_valid'] = 1
             if row['dm'] >= min(cand_df.loc[index,'cand_ne2001'], cand_df.loc[index,'cand_ymw16']):
-                cand_df.loc[index,'cand_valid'] = 1
+                cand_df.loc[index,'cand_gal'] = 0
             else:
-                cand_df.loc[index,'cand_valid'] = 0
+                cand_df.loc[index,'cand_gal'] = 1
             cand_df.loc[index,'ATAZIND'] = interpolate_value(row['cand_mjd'], influx_df[mask], 'ATAZIND')
             cand_df.loc[index,'ATELIND'] = interpolate_value(row['cand_mjd'], influx_df[mask], 'ATELIND')
             cand_df.loc[index,'AZCORR'] = interpolate_value(row['cand_mjd'], influx_df[mask], 'AZCORR')
@@ -123,6 +124,8 @@ if __name__ == "__main__":
     mjd = float(sys.argv[1])
     influx_df = mjd2influx(mjd)
     print(influx_df)
+    influx_df.to_pickle(sys.argv[2])
+    #influx_df.to_csv(str(mjd)+'.csv')
     if influx_df is None:
         print(mjd, None)
     else:
