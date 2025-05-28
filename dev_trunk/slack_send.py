@@ -24,16 +24,19 @@ def send_img_2_slack(img):
     TOKEN = data_loaded['slack']['bot_oauth']
     
     client = SlackClient(TOKEN)
-    attachments = [{"title": "Candidate", "image_url": img}]
-    response = client.chat_postMessage(channel='CPAK5A4G2', text='Potential Candidate',
+    attachments = [{"title": "", "image_url": img}]
+    response = client.chat_postMessage(channel='CPAK5A4G2', text='',
                 attachments=attachments)
-    return response
+    response2 = client.chat_postMessage(channel='C013W4P08MB', text='',
+                attachments=attachments)
+    return f"{response}\n{response2}"
 
 
 if __name__ == "__main__":
     logger = logging.getLogger()
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(level=logging.INFO, format=format)
-    respose = send_msg_2_slack("Hello from Python! :tada:")
-    logging.info(f'{respose}')
-    respose = send_img_2_slack('https://images.sftcdn.net/images/t_app-cover-l,f_auto/p/befbcde0-9b36-11e6-95b9-00163ed833e7/260663710/the-test-fun-for-friends-screenshot.jpg')
+    #respose = send_msg_2_slack("Hello from Python! :tada:")
+    #logging.info(f'{respose}')
+    response = send_img_2_slack('https://www.dropbox.com/scl/fi/rx5c6kn2jbaxdz2mopfqe/cand_tstart_60586.508384786939_tcand_426.2090000_dm_5454.92000_snr_10.30260.png?rlkey=3bvcyn05xwk5p52o4rhobi8uk&dl=1')
+    logging.info(f"{response}")
