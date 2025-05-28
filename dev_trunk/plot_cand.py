@@ -63,6 +63,12 @@ def h5_loction_2_stuff(h5_file):
     df_mask_dm = df['dm'] == stuff_dict['dm']
     df_mask_snr = df['snr'] == stuff_dict['snr']
     df_mask_tcand = df['tcand'] == stuff_dict['tcand']
+    # Fix for when the above does not find the value in the df
+    for name, mask in zip(("dm", "snr", "tcand"), (df_mask_dm, df_mask_snr, df_mask_tcand)):
+        if mask.sum() == 0:
+            logging.warning(f"{name} mask didn't find any candidate! Looking for closest match.")
+            index = df[name].sub(stuff_dict[name]).abs().idxmin()
+            mask[index] = True 
     total_mask = df_mask_dm & df_mask_snr & df_mask_tcand
     row = df[total_mask]
     ra, dec = deg2HMS(ra=row['RA_deg'].values[0], dec=row['DEC_deg'].values[0])
