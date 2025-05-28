@@ -117,9 +117,9 @@ def begin_main(values):
                 logging.info('Less than 33s of data is valid, skipping this file')
                 _cmdline(f'rm {filterbank}')
                 return None
-            else:
-                es=Elasticsearch([{'host':'localhost','port':9200}])
-                tel_df_to_es(es,df,filterbank)
+            #else:
+            #    es=Elasticsearch([{'host':'localhost','port':9200}])
+            #    tel_df_to_es(es,df,filterbank)
         else:
             logging.info("Don't know what's going on!")
             send_msg_2_slack(f"No info from InfluxDB")
@@ -130,6 +130,11 @@ def begin_main(values):
         chan_nos=np.arange(0,bandpass.shape[0])
         mask=mask_finder(bandpass,values.sigma) #chan_nos,values.nchans,values.sigma)
         bad_chans=chan_nos[mask]
+
+        frac_flagged=mask.sum()/4096
+
+        es=Elasticsearch([{'host':'localhost','port':9200}])
+        tel_df_to_es(es,df,filterbank, frac_flagged)
 
         out_chans=[]
         
