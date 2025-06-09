@@ -5,6 +5,12 @@ import logging
 from psrqpy import QueryATNF
 from plot_cand import qpsr
 
+def rowSort(psr):
+    """
+    Helper function which sorts astropy table row 'psr' according to the database schema order and places it into an ordered tuple.
+    """
+    return (psr['NAME'], psr['RAJ'], psr['DECJ'], psr['P0'], psr['DM'],psr['W50'],psr['W10'],psr['S1400'],psr['ASSOC'])
+
 def connect(file):
     """
     Connects to a database at given path.
@@ -67,11 +73,54 @@ def searchForSourceToAdd(db, ra, dec):
     if len(qTable) > 0:
         print(qTable)
         psr = qTable[0]
-        c.execute(storeString, (psr['NAME'], psr['RAJ'], psr['DECJ'], psr['P0'], psr['DM'],psr['W50'],psr['W10'],psr['S1400'],psr['ASSOC']))
+        c.execute(storeString, rowSort(psr))
         conn.commit()
     conn.close()
         
+def filteredSearch(db, ra, dec, epsilon=0.05, width=None, DM=None):
+    """
+    Searches ATNF database for pulsars within 1 degree of coordinates with pulse width and/or DM conditions.
 
+    Positional arguments:
+    db (string) -- filename of database
+    ra (float) -- right ascention in degrees with decimals
+    dec (float) -- declination in degrees with decimals
+
+    Keyword arguments:
+    epsilon (float) -- factor of value to use as conditional window (default 0.05)
+    width (float) -- width of pulse in milliseconds (default None)
+    DM (float) -- Dispersion measure in pc/cm3 (default None)
+    """
+
+    conn = connect(db)
+    if conn is None:
+        logging.critical('Connect object failed')
+        return
+    c = conn.cursor()
+    storeString = """ INSERT INTO detections(Name, RAJ, DecJ, P0, DM, W50, W10, S1400, Assoc)
+    VALUES (?,?,?,?,?,?,?,?,?)
+    """
+
+    #start by constructing search filter
+    if width is not None:
+        filterString = f"(W50 > {width*(1-epsilon)} && W50 < {width*(1+epsilon)})"
+        if DM is not None: #if both, need &&
+            filterString += f" && (DM > {DM*(1-epsilon)} && DM < {DM*(1+epsilon)})"
+    elif DM is not None:
+        filterString += f"(DM > {DM*(1-epsilon)} && DM < {DM*(1+epsilon)})"
+    else:
+        logging.warn("Filtered search run with no filters.")
+        filterString = None
+
+    query, qTable = qpsr(ra, dec, params = ['NAME','RAJ', 'DECJ', 'P0', 'DM', 'W50', 'W10', 'S1400', 'ASSOC'], condition=filterString)
+    qTable = query.table #reassign due to a hardcoded slice in original function
+    logging.info(f"Sources found: {len(qTable)}")
+    if len(qTable) > 0:
+        print(qTable)
+        psr = qTable[0]
+        c.execute(storeString, rowSort(psr))
+        conn.commit()
+    conn.close()
     
     
 
@@ -83,7 +132,7 @@ if __name__ == '__main__':
     #TODO: Add arguments for different queries and possibly additions
     #Example argument add: parser.add_argument('-f', '--files', nargs='+', help='Filterbank file')
     parser.add_argument('--db', dest='dbfile', help='Database file')
-    parser.add_argument('-s', '--search', dest='searchString', help='Test search ra/dec')
+    parser.add_argument('-s', '--search', dest='searchString', help='Test search ra/dec/width')
     parser.set_defaults(dbfile=path.join(curdir,'test.db'))
     parser.set_defaults(searchString = None)
     parser.set_defaults(verbose=False)
@@ -98,5 +147,5 @@ if __name__ == '__main__':
     logging.debug(f"Accessing database at {values.dbfile}")
     schema(values.dbfile)
     if values.searchString is not None:
-        ra, dec = values.searchString.split(" ")
-        searchForSourceToAdd(values.dbfile, float(ra), float(dec))
+        ra, dec, w, dm = values.searchString.split(" ")
+        filteredSearch(values.dbfile, float(ra), float(dec), epsilon=0.001, width=float(w), DM=float(dm))
