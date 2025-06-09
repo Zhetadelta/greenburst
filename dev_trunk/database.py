@@ -79,7 +79,7 @@ def searchForSourceToAdd(db, ra, dec):
         
 def filteredSearch(db, ra, dec, epsilon=0.05, width=None, DM=None):
     """
-    Searches ATNF database for pulsars within 1 degree of coordinates with pulse width and/or DM conditions.
+    Searches ATNF database for pulsars within 1 degree of coordinates with pulse width and/or DM conditions and appends to local database.
 
     Positional arguments:
     db (string) -- filename of database
@@ -90,6 +90,8 @@ def filteredSearch(db, ra, dec, epsilon=0.05, width=None, DM=None):
     epsilon (float) -- factor of value to use as conditional window (default 0.05)
     width (float) -- width of pulse in milliseconds (default None)
     DM (float) -- Dispersion measure in pc/cm3 (default None)
+
+    Returns True if at least one source is found, and False otherwise.
     """
 
     conn = connect(db)
@@ -120,7 +122,11 @@ def filteredSearch(db, ra, dec, epsilon=0.05, width=None, DM=None):
         psr = qTable[0]
         c.execute(storeString, rowSort(psr))
         conn.commit()
+        conn.close()
+        return True
     conn.close()
+    return False
+    
     
     
 
