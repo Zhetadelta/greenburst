@@ -179,7 +179,7 @@ if __name__ == '__main__':
     logging.debug(f"Accessing database at {values.dbfile}")
     schema(values.dbfile)
     if values.h5File is not None:
-        raise NotImplementedError #whoops
+        processh5File(values.h5File)
     elif values.searchString is not None:
         ra, dec, w, dm = values.searchString.split(" ")
         filteredSearch(values.dbfile, float(ra), float(dec), epsilon=0.001, width=float(w), DM=float(dm))
