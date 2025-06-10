@@ -14,7 +14,10 @@ import tqdm
 from psrqpy import QueryATNF
 
 def qpsr(sample_ra =6.02363,sample_dec =-72.08128, params = ['BNAME','JNAME', 'RAJ', 'DECJ','DM', 'S1400', 'P0'], condition = None):
-    (ra,dec)=deg2HMS(ra=sample_ra, dec=sample_dec)
+    if isinstance(sample_ra, str): #allow preformatted ra/dec
+        (ra,dec) = (sample_ra, sample_dec)
+    else:
+        (ra,dec)=deg2HMS(ra=sample_ra, dec=sample_dec)
     c=[ra,dec,1]
     #c=['00h24m05.67s','-72d04m52.62s',1]
     logging.info(f'Querying with  {c}')
