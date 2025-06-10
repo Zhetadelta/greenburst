@@ -18,8 +18,7 @@ def tsRowSort(ts):
     Helper function which sorts telescope dictionary 'ts' according to the database schema order and returns an ordered list.
     """
 
-    logging.warn('Telescope elevation is not implemented yet. Not a problem, just be aware')
-    return [ts['MJD'], Time(ts['MJD'], format='mjd').iso, ts['Turret Angle (degree)'], None, ts['Receiver']]
+    return [ts['MJD'], Time(ts['MJD'], format='mjd').iso, ts['Turret Angle (degree)'], ts['Receiver']]
 
 
 def connect(file):
@@ -57,8 +56,7 @@ def schema(file):
     Assoc text,
     MJD real,
     UTC text,
-    Azimuth real,
-    Elevation real,
+    Turret real,
     Receiver text
     ); """
 
@@ -122,15 +120,16 @@ def addRow(psr, ts=None, db=path.join(curdir,'test.db')):
         logging.critical('Connect object failed')
         return False
     c = conn.cursor()
-    storeString = """ INSERT INTO detections(Name, RAJ, DecJ, P0, DM, W50, W10, S1400, Assoc, MJD, UTC, Azimuth, Elevation, Receiver)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+    storeString = """ INSERT INTO detections(Name, RAJ, DecJ, P0, DM, W50, W10, S1400, Assoc, MJD, UTC, Turret, Receiver)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
     """
 
     if ts is not None:
         info = psrRowSort(psr) + tsRowSort(ts)
     else:
-        info = psrRowSort(psr) + ([None]*5) #make sure they're the same length
-    logging.warn('Using test database file!')
+        info = psrRowSort(psr) + ([None]*4) #make sure they're the same length
+    if db == path.join(curdir,'test.db'):
+        logging.warn('Using test database file!')
     c.execute(storeString, info)
     conn.commit()
     conn.close()
