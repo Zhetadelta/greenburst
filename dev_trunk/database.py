@@ -103,7 +103,7 @@ def filteredSearch(ra, dec, epsilon=0.02, width=None, DM=None):
         return qTable[0]
     return False
     
-def addRow(psr, ts=None):
+def addRow(psr, ts=None, db=path.join(curdir,'test.db')):
     """
     Given a astropy table row 'psr' and h5 parameter dictionary 'ts', adds a database entry.
 
@@ -112,6 +112,7 @@ def addRow(psr, ts=None):
 
     Keyword arguments:
     ts (dict) -- Dictionary of parameters from h5 file (default None)
+    db (string) -- database file to add to (default 'test.db')
 
     Returns True if row sucessfully added, False otherwise.
     """
@@ -129,7 +130,7 @@ def addRow(psr, ts=None):
         info = psrRowSort(psr) + tsRowSort(ts)
     else:
         info = psrRowSort(psr) + ([None]*5) #make sure they're the same length
-
+    logging.warn('Using test database file!')
     c.execute(storeString, info)
     conn.commit()
     conn.close()
