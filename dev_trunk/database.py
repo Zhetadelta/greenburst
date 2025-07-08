@@ -88,7 +88,7 @@ def filteredSearch(ra, dec, epsilon=0.02, width=None, DM=None):
         if DM is not None: #if both, need &&
             filterString += f" && (DM > {DM*(1-epsilon)} && DM < {DM*(1+epsilon)})"
     elif DM is not None:
-        filterString += f"(DM > {DM*(1-epsilon)} && DM < {DM*(1+epsilon)})"
+        filterString = f"(DM > {DM*(1-epsilon)} && DM < {DM*(1+epsilon)})"
     else:
         logging.warn("Filtered search run with no filters.")
         filterString = None
