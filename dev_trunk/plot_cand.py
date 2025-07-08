@@ -48,7 +48,19 @@ def deg2HMS(ra='', dec='', round=False):
     RA = '{0}{1}h{2}m{3:.2f}s'.format(rs, raH, raM, raS)
     return (RA, DEC)
 
-def h5_loction_2_stuff(h5_file):
+def h5_loction_2_stuff(h5_file, csv_path = None):
+    """
+    Reads an h5 file into two dictionaries with various fields I'll document later.
+
+    Positional arguments:
+    h5_file (String) -- filename and path of h5 file.
+
+    Keyword arguments:
+    csv_path (String) -- file path of CSV associated with the h5 file. For manual processing. (Default None)
+
+    Returns (dict, dict) whose fields remain a mystery to me at this moment.
+    """
+
     param_dict=OrderedDict()
     stuff_dict={}
     with h5py.File(h5_file,'r') as file:
@@ -59,10 +71,13 @@ def h5_loction_2_stuff(h5_file):
         stuff_dict['tcand'] = float(file.attrs['tcand'])
         
     folder = h5_file.split('/')[3]
-    if "gal" in h5_file:
-        df = pd.read_csv(f'/ldata/trunk/{folder}/{folder}_gal.csv')
+    if csv_path is None:
+        if "gal" in h5_file:
+            df = pd.read_csv(f'/ldata/trunk/{folder}/{folder}_gal.csv')
+        else:
+            df = pd.read_csv(f'/ldata/trunk/{folder}/{folder}.csv')
     else:
-        df = pd.read_csv(f'/ldata/trunk/{folder}/{folder}.csv')
+        df = pd.read_csv(csv_path)
     df_mask_dm = df['dm'] == stuff_dict['dm']
     df_mask_snr = df['snr'] == stuff_dict['snr']
     df_mask_tcand = df['tcand'] == stuff_dict['tcand']

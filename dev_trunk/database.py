@@ -66,7 +66,7 @@ def schema(file):
         conn.commit()
         conn.close()
         
-def filteredSearch(ra, dec, epsilon=0.02, width=None, DM=None):
+def filteredSearch(ra, dec, epsilon=0.1, width=None, DM=None):
     """
     Searches ATNF database for pulsars within 1 degree of coordinates with pulse width and/or DM conditions.
 
@@ -135,17 +135,18 @@ def addRow(psr, ts=None, db=path.join(curdir,'test.db')):
     conn.close()
     return True
     
-def processh5File(h5File):
+def processh5File(h5File, csvPath):
     """
     Given an h5 file, searches ATNF for a match and adds a row to database if one is found :3
 
     Positional arguments:
     h5File (string) -- Filename of an h5 file
+    csvPath (string or None) -- Filename of associated csv file 
 
     Returns True if source is found and added to database, False if no source or database error.
     """
 
-    stuff, params = h5_loction_2_stuff(h5File)
+    stuff, params = h5_loction_2_stuff(h5File, csv_path=csvPath)
     ra = params['RA (J2000)']
     dec = params['DEC (J2000)']
     dm = params['DM (pc/cc)']
@@ -164,9 +165,11 @@ if __name__ == '__main__':
     parser.add_argument('--db', dest='dbfile', help='Database file')
     parser.add_argument('-s', '--search', dest='searchString', help='Test search ra/dec/width')
     parser.add_argument('-f', '--file', dest='h5File', help='h5 file to process and add to database')
+    parser.add_argument('-c', '--csv', dest='csvFile', help='csv file containing info for h5 file')
     parser.set_defaults(dbfile=path.join(curdir,'test.db'))
     parser.set_defaults(searchString = None)
     parser.set_defaults(h5File = None)
+    parser.set_defaults(csvFile=None)
     parser.set_defaults(verbose=False)
     values = parser.parse_args()
 
@@ -179,7 +182,7 @@ if __name__ == '__main__':
     logging.debug(f"Accessing database at {values.dbfile}")
     schema(values.dbfile)
     if values.h5File is not None:
-        processh5File(values.h5File)
+        processh5File(values.h5File, values.csvFile)
     elif values.searchString is not None:
         ra, dec, w, dm = values.searchString.split(" ")
         filteredSearch(values.dbfile, float(ra), float(dec), epsilon=0.001, width=float(w), DM=float(dm))
