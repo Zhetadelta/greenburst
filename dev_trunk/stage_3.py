@@ -11,6 +11,7 @@ import dropbox
 import yaml
 import re
 from slack_send import send_img_2_slack
+from database import processh5File
 
 logger = logging.getLogger()
 format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -43,6 +44,8 @@ def begin_main(values):
     TOKEN = data_loaded['dropbox']['token']
     dbx = dropbox.Dropbox(TOKEN)
     try:
+        if processh5File(values.file): #source with matching DM found
+            logging.info(f"Existing source found for file {values.file}")
         fout, known_src = plotem(values.file, nrby=True) #modified: get nearby source info
         file_name=fout.split('/')[-1][:-3]
         with open(fout, 'rb') as f:

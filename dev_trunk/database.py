@@ -90,7 +90,7 @@ def filteredSearch(ra, dec, epsilon=0.1, width=None, DM=None):
     elif DM is not None:
         filterString = f"(DM > {DM*(1-epsilon)} && DM < {DM*(1+epsilon)})"
     else:
-        logging.warn("Filtered search run with no filters.")
+        logging.warning("Filtered search run with no filters.")
         filterString = None
 
     query, qTable = qpsr(ra, dec, params = ['NAME','RAJ', 'DECJ', 'P0', 'DM', 'W50', 'W10', 'S1400', 'ASSOC'], condition=filterString)
@@ -129,7 +129,7 @@ def addRow(psr, ts=None, db=path.join(curdir,'test.db')):
     else:
         info = psrRowSort(psr) + ([None]*4) #make sure they're the same length
     if db == path.join(curdir,'test.db'):
-        logging.warn('Using test database file!')
+        logging.warning('Using test database file!')
     c.execute(storeString, info)
     conn.commit()
     conn.close()
