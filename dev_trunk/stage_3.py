@@ -44,7 +44,7 @@ def begin_main(values):
     TOKEN = data_loaded['dropbox']['token']
     dbx = dropbox.Dropbox(TOKEN)
     try:
-        if processh5File(values.file): #source with matching DM found
+        if processh5File(values.file, None): #source with matching DM found
             logging.info(f"Existing source found for file {values.file}")
         fout, known_src = plotem(values.file, nrby=True) #modified: get nearby source info
         file_name=fout.split('/')[-1][:-3]
