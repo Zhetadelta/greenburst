@@ -108,7 +108,7 @@ def write_and_plot(chan_nos, freqs, bandpass, outdir, mask=None):
     plt.savefig(bp_plot, bbox_inches="tight")
 
 
-def begin_main(values):
+def begin_main(values, ret=False):
     format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     if values.verbose:
         logging.basicConfig(level=logging.DEBUG, format=format)
@@ -186,7 +186,8 @@ def begin_main(values):
 
         p1.join()
         p2.join()
-
+        if ret:
+            return f"/ldata/trunk/{filterbank_name}"
         send2Q("stage02_queue", f"/ldata/trunk/{filterbank_name}")
     except IndexError:
         pass
