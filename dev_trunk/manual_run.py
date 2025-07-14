@@ -26,7 +26,7 @@ def parseS1(s1String):
     s1parser.add_argument("-f", "--file", type=str, help="Filterbank file")
     s1parser.set_defaults(verbose=False)
     s1parser.set_defaults(daemon=False)
-    values = s1parser.parse_args()
+    return s1parser.parse_args()
 
 if __name__ == "__main__":
     parser = ArgumentParser(
