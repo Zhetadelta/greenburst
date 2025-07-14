@@ -124,6 +124,7 @@ def begin_main(values, ret=False):
         if df is not None:
             if len(df) < 33:
                 #send_msg_2_slack(f"Pointing info is missing!")
+                logging.info("Less than 33s of data is valid, skipping this file")
                 pass
             all_data_valid = df["DATA_VALID"].sum()
             if all_data_valid < 33:
