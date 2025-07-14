@@ -17,7 +17,7 @@ from elasticsearch import Elasticsearch
 from pika.exceptions import *  # StreamLostError, ConnectionResetError
 from scipy.signal import savgol_filter
 
-from dump_all_new import tel_df_to_es
+from dump_all import tel_df_to_es
 from gpu_client import send2gpuQ
 from influx_2df import mjd2influx
 from pika_send import send2Q
