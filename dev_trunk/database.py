@@ -1,3 +1,4 @@
+#!/usr/bin/env python3.6
 import sqlite3 as sql
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from astropy.time import Time
