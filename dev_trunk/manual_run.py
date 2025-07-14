@@ -45,5 +45,5 @@ if __name__ == "__main__":
     s1String = f"-f {values.file} -v {values.verbose}"
     s1Args = parseS1(s1String)
     s1Ret = stage1(s1Args, ret=True) 
-
+    print(s1Ret)
     
