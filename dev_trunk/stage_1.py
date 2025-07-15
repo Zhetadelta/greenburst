@@ -201,6 +201,7 @@ def begin_main(values, ret=False):
             return f"/ldata/trunk/{filterbank_name}"
         send2Q("stage02_queue", f"/ldata/trunk/{filterbank_name}")
     except IndexError:
+        logging.debug("Index error occurred.")
         pass
     return None
 
@@ -245,4 +246,5 @@ if __name__ == "__main__":
         logging.info("Running in daemon mode")
         stage_initer(values)
     else:
+        logging.info("Running in normal mode")
         begin_main(values)
