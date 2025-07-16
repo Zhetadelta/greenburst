@@ -196,8 +196,12 @@ def begin_main(values):
                 
                 if label_mask.sum() >= 1:
                     files = results[label_mask]["candidate"]
-                    for file in files:
-                        send2Q("stage03_queue", file)
+                    if values.outfile:
+                        with open(f"{base_work_dir}/{folder}/stage2_results.out", "w+") as outfile:
+                            outfile.writelines(files)
+                    else:
+                        for file in files:
+                            send2Q("stage03_queue", file)
                 else:
                     delete_cmd = "put delete cmd here"
                     # subprocess.run(cmd.split(), stdout=subprocess.PIPE)
@@ -239,9 +243,11 @@ if __name__ == "__main__":
         help="minimum number of members in the cluster",
         default=5,
     )
+    parser.add_argument("-o", "--outfile", dest=outfile, action="store_true", help="write filenames to file instead of queuing")
     parser.add_argument("-f", "--files", type=str, help="cand files")
     parser.set_defaults(verbose=False)
     parser.set_defaults(daemon=True)
+    parser.set_defaults(outfile=False)
     values = parser.parse_args()
 
     if values.verbose:

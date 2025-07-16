@@ -38,15 +38,11 @@ def stage_initer(values):
     
     channel.start_consuming()
 
-def begin_main(values):
-    with open("config/conf.yaml", 'r') as stream:
-        data_loaded = yaml.load(stream)
-    TOKEN = data_loaded['dropbox']['token']
-    dbx = dropbox.Dropbox(TOKEN)
+def process_file(file_name):
     try:
-        if processh5File(values.file, None): #source with matching DM found
-            logging.info(f"Existing source found for file {values.file}")
-        fout, known_src = plotem(values.file, nrby=True) #modified: get nearby source info
+        if processh5File(file_name, None): #source with matching DM found
+            logging.info(f"Existing source found for file {file_name}")
+        fout, known_src = plotem(file_name, nrby=True) #modified: get nearby source info
         file_name=fout.split('/')[-1][:-3]
         with open(fout, 'rb') as f:
             data = f.read()
@@ -59,7 +55,19 @@ def begin_main(values):
         logging.info(f'Dropbox URL {slack_send_url}')
         logging.info(send_img_2_slack(slack_send_url, nrby=known_src))
     except Exception as error:
-        logging.warning(f"Encountered {error} while processing file {values.file}")
+        logging.warning(f"Encountered {error} while processing file {file_name}")
+
+def begin_main(values):
+    with open("config/conf.yaml", 'r') as stream:
+        data_loaded = yaml.load(stream)
+    TOKEN = data_loaded['dropbox']['token']
+    dbx = dropbox.Dropbox(TOKEN)
+    if values.file is not None:
+        process_file(values.file)
+    else:
+        with open(values.filelist, "r") as file:
+            for fname in file.readlines():
+                process_file(fname)
     return None
 
 
@@ -68,6 +76,9 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help='Be verbose')
     parser.add_argument('-d', '--daemon', dest='daemon', action='store_false', help='Run with AMQP')
     parser.add_argument('-f', '--file', nargs='+')
+    parser.add_argument('-F', '--filelist', type=str, help="file containing list of stage 2 outputs")
+    parser.set_defaults(file=None)
+    parser.set_defaults(filelist=None)
     parser.set_defaults(verbose=False)
     parser.set_defaults(daemon=True)
     values = parser.parse_args()
@@ -82,5 +93,7 @@ if __name__ == '__main__':
         logging.info('Running in daemon mode')
         stage_initer(values)
     else:
-        print(values.file)
+        if (values.file is None) and values.filelist is None:
+            logging.critical("No file or list of files given. Closing.")
+            return None
         begin_main(values)
