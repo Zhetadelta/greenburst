@@ -95,5 +95,5 @@ if __name__ == '__main__':
     else:
         if (values.file is None) and values.filelist is None:
             logging.critical("No file or list of files given. Closing.")
-            return None
-        begin_main(values)
+        else:
+            begin_main(values)
