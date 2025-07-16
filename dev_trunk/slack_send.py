@@ -10,6 +10,9 @@ def send_msg_2_slack(msg):
     with open("config/conf.yaml", 'r') as stream:
         data_loaded = yaml.load(stream)
     TOKEN = data_loaded['slack']['bot_oauth']
+
+    logging.warning(f"Slack message intercepted: {msg}")
+    return True
     
     client = SlackClient(TOKEN)
     response = client.chat_postMessage(
@@ -37,6 +40,9 @@ def send_img_2_slack(img, nrby=True):
     with open("config/conf.yaml", 'r') as stream:
         data_loaded = yaml.load(stream)
     TOKEN = data_loaded['slack']['bot_oauth']
+
+    logging.warning("Slack message intercepted: [image]")
+    return True
     
     client = SlackClient(TOKEN)
     attachments = [{"title": "", "image_url": img}]

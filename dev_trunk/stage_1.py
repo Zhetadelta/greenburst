@@ -21,7 +21,7 @@ from dump_all import tel_df_to_es
 from gpu_client import send2gpuQ
 from influx_2df import mjd2influx
 from pika_send import send2Q
-#from slack_send import *
+from slack_send import *
 
 logger = logging.getLogger()
 format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -136,13 +136,13 @@ def begin_main(values, ret=False):
                     logging.info("Less than 33s of data is valid, skipping this file")
                     #_cmdline(f"rm {filterbank}")
                     return None
-                # else:
-                #    es=Elasticsearch([{'host':'localhost','port':9200}])
-                #    tel_df_to_es(es,df,filterbank)
+                else:
+                    es=Elasticsearch([{'host':'localhost','port':9200}])
+                    tel_df_to_es(es,df,filterbank)
             else:
                 logging.warning("No response from InfluxDB.")
-                #send_msg_2_slack(f"No info from InfluxDB")
-                #_cmdline(f"rm {filterbank}")
+                send_msg_2_slack(f"No info from InfluxDB")
+                _cmdline(f"rm {filterbank}")
                 return None
             logging.info(f"{100*all_data_valid/len(df)}% data valid")
         bandpass = fil_obj.bandpass
