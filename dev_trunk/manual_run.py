@@ -3,7 +3,7 @@
 from stage_1 import begin_main as stage1
 from stage_2 import begin_main as stage2
 from stage_3 import begin_main as stage3
-from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, Namespace
 
 def parseS1(s1String):
     s1parser = ArgumentParser()
@@ -42,9 +42,8 @@ if __name__ == "__main__":
     values = parser.parse_args()
     #build fake arguments for stage 1 and ask for a return value
     #this value is normally passed to stage 2 via a queue system but 
-    #i dont want to figure that out right now
-    s1String = f"-f {values.file} -v {values.verbose}"
-    s1Args = parseS1(s1String)
+    #let's keep it simple
+    s1args = Namespace(file=values.file, verbose=values.verbose)
     s1Ret = stage1(s1Args, ret=True) 
     print(s1Ret)
     

@@ -108,7 +108,7 @@ def write_and_plot(chan_nos, freqs, bandpass, outdir, mask=None):
     plt.savefig(bp_plot, bbox_inches="tight")
 
 
-def begin_main(values, ret=False):
+def begin_main(values):
     format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     if values.verbose:
         logging.basicConfig(level=logging.DEBUG, format=format)
@@ -197,7 +197,7 @@ def begin_main(values, ret=False):
 
         p1.join()
         p2.join()
-        if ret:
+        if values.ret:
             return f"/ldata/trunk/{filterbank_name}"
         send2Q("stage02_queue", f"/ldata/trunk/{filterbank_name}")
     except IndexError:
@@ -230,10 +230,12 @@ if __name__ == "__main__":
         help="sigma over which values are tagged as RFI",
         default=5,
     )
+    parser.add_argument("-r", "--return", dest="ret", action="store_true", help="Return filename instead of adding to queue")
     parser.add_argument("-f", "--file", type=str, help="Filterbank file")
     parser.set_defaults(verbose=False)
     parser.set_defaults(daemon=True)
     parser.set_defaults(influx=True)
+    parser.set_defaults(ret=False)
     values = parser.parse_args()
 
     format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
