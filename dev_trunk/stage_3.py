@@ -67,7 +67,7 @@ def begin_main(values):
     else:
         with open(values.filelist, "r") as file:
             for fname in file.readlines():
-                process_file(fname.strip("/n"))
+                process_file(fname[:-1]) #strip the newline
     return None
 
 
