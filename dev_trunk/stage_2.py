@@ -69,6 +69,7 @@ def begin_main(values):
                     header=None,
                     comment="#",
                     delim_whitespace=True,
+                    engine="python",
                     names=[
                         "snr",
                         "sample",
@@ -252,4 +253,5 @@ if __name__ == "__main__":
         logging.info("Running in daemon mode")
         stage_initer(values)
     else:
+        logging.info(f"Running in normal mode on folder {values.files}")
         begin_main(values)
