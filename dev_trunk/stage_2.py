@@ -198,7 +198,8 @@ def begin_main(values):
                     files = results[label_mask]["candidate"]
                     if values.outfile:
                         with open(f"{base_work_dir}/{folder}/stage2_results.out", "w+") as outfile:
-                            outfile.writelines(files)
+                            for file in files:
+                                outfile.write(f"{file}\n")
                     else:
                         for file in files:
                             send2Q("stage03_queue", file)
