@@ -243,7 +243,7 @@ if __name__ == "__main__":
         help="minimum number of members in the cluster",
         default=5,
     )
-    parser.add_argument("-o", "--outfile", dest=outfile, action="store_true", help="write filenames to file instead of queuing")
+    parser.add_argument("-o", "--outfile", dest="outfile", action="store_true", help="write filenames to file instead of queuing")
     parser.add_argument("-f", "--files", type=str, help="cand files")
     parser.set_defaults(verbose=False)
     parser.set_defaults(daemon=True)
