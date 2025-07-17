@@ -198,6 +198,7 @@ def begin_main(values):
         p1.join()
         p2.join()
         if values.ret:
+            logging.info(f"Stage 1 output to /ldata/trunk/{filterbank_name}")
             return f"/ldata/trunk/{filterbank_name}"
         send2Q("stage02_queue", f"/ldata/trunk/{filterbank_name}")
     except IndexError:
