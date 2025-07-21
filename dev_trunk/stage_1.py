@@ -182,8 +182,13 @@ def begin_main(values):
         logging.info(f"Running {jess_command}")
         send2gpuQ(jess_command)
 
+        if values.smallgulp:
+            gulp = ""
+        else:
+            gulp = "-nsamps_gulp 524288"
+            
         heimdall_command = (
-            "heimdall -nsamps_gulp 524288 -dm 10 10000 -boxcar_max 4096 -cand_sep_dm_trial 200 -cand_sep_time 128 -cand_sep_filter 3"
+            f"heimdall {gulp} -dm 10 10000 -boxcar_max 4096 -cand_sep_dm_trial 200 -cand_sep_time 128 -cand_sep_filter 3"
             + " -rfi_no_broad"  #  -rfi_no_narrow
             + " -output_dir {}".format(out_dir)
             + " -f {}".format(clean_fil_path)
@@ -225,6 +230,9 @@ if __name__ == "__main__":
         "-n", "--nchans", type=int, help="no. of chans to calc. median over", default=64
     )
     parser.add_argument(
+        "-g", "--smallgulp", action="store_true", help="Set if using a file shorter than 524288 samples."
+    )
+    parser.add_argument(
         "-s",
         "--sigma",
         type=int,
@@ -237,6 +245,7 @@ if __name__ == "__main__":
     parser.set_defaults(daemon=True)
     parser.set_defaults(influx=True)
     parser.set_defaults(ret=False)
+    parser.set_defaults(smallgulp=False)
     values = parser.parse_args()
 
     format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
