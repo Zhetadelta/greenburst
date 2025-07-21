@@ -48,7 +48,7 @@ def deg2HMS(ra='', dec='', round=False):
     RA = '{0}{1}h{2}m{3:.2f}s'.format(rs, raH, raM, raS)
     return (RA, DEC)
 
-def h5_loction_2_stuff(h5_file, csv_path = None):
+def h5_loction_2_stuff(h5_file, csv_path = None, skip_pointing = False):
     """
     Reads an h5 file into two dictionaries with various fields I'll document later.
 
@@ -57,6 +57,7 @@ def h5_loction_2_stuff(h5_file, csv_path = None):
 
     Keyword arguments:
     csv_path (String) -- file path of CSV associated with the h5 file. For manual processing. (Default None)
+    skip_pointing (bool)  -- skip pointing data for test purposes (default False)
 
     Returns (dict, dict) whose fields remain a mystery to me at this moment.
     """
@@ -89,35 +90,54 @@ def h5_loction_2_stuff(h5_file, csv_path = None):
             mask[index] = True 
     total_mask = df_mask_dm & df_mask_snr & df_mask_tcand
     row = df[total_mask]
-    ra, dec = deg2HMS(ra=row['RA_deg'].values[0], dec=row['DEC_deg'].values[0])
-    if len(row) > 0:
-        param_dict['S/N'] = float(row['snr'].values[0])
-        param_dict['Width (ms)'] = float(0.256* 2**row['width'].values[0])
-        param_dict['Width (samples)'] = int(2**row['width'].values[0])
-        param_dict['DM (pc/cc)'] = float(row['dm'].values[0])
-        param_dict['NE2001 DM (pc/cc)'] = float(row['cand_ne2001'].values[0])
-        param_dict['YMW16 DM (pc/cc)'] = float(row['cand_ymw16'].values[0])
-        param_dict['MJD'] = str(row['cand_mjd'].values[0])
-        param_dict['RA (J2000)'] = str(ra)
-        param_dict['DEC (J2000)'] = str(dec)
-        param_dict['GL (degree)'] = float(row['cand_gl'].values[0])
-        param_dict['GB (degree)'] = float(row['cand_gb'].values[0])
-        param_dict['Receiver'] = str(row['IFV1TNCI'].values[0])
-        param_dict['Project ID'] = str(row['SCPROJID'].values[0])
-        param_dict['Observation ID'] = str(folder)
-        param_dict['Turret Angle (degree)'] = float(row['ATRXOCTA'].values[0])
-        if np.min([param_dict['NE2001 DM (pc/cc)'], param_dict['YMW16 DM (pc/cc)']]) > param_dict['DM (pc/cc)']:
-            query, psr_table = qpsr(float(row['RA_deg'].values[0]), float(row['DEC_deg'].values[0]))
-            if len(psr_table) > 0:
-                param_dict['Known Nearby Sources'] = [query, psr_table]
-                logging.debug(psr_table)
-            else:
-                param_dict['Known Nearby Sources'] = str(None)
-                logging.info('No known pulsars in the field')
+    if not skip_pointing:
+        ra, dec = deg2HMS(ra=row['RA_deg'].values[0], dec=row['DEC_deg'].values[0])
+        if len(row) > 0:
+            param_dict['S/N'] = float(row['snr'].values[0])
+            param_dict['Width (ms)'] = float(0.256* 2**row['width'].values[0])
+            param_dict['Width (samples)'] = int(2**row['width'].values[0])
+            param_dict['DM (pc/cc)'] = float(row['dm'].values[0])
+            param_dict['NE2001 DM (pc/cc)'] = float(row['cand_ne2001'].values[0])
+            param_dict['YMW16 DM (pc/cc)'] = float(row['cand_ymw16'].values[0])
+            param_dict['MJD'] = str(row['cand_mjd'].values[0])
+            param_dict['RA (J2000)'] = str(ra)
+            param_dict['DEC (J2000)'] = str(dec)
+            param_dict['GL (degree)'] = float(row['cand_gl'].values[0])
+            param_dict['GB (degree)'] = float(row['cand_gb'].values[0])
+            param_dict['Receiver'] = str(row['IFV1TNCI'].values[0])
+            param_dict['Project ID'] = str(row['SCPROJID'].values[0])
+            param_dict['Observation ID'] = str(folder)
+            param_dict['Turret Angle (degree)'] = float(row['ATRXOCTA'].values[0])
+            if np.min([param_dict['NE2001 DM (pc/cc)'], param_dict['YMW16 DM (pc/cc)']]) > param_dict['DM (pc/cc)']:
+                query, psr_table = qpsr(float(row['RA_deg'].values[0]), float(row['DEC_deg'].values[0]))
+                if len(psr_table) > 0:
+                    param_dict['Known Nearby Sources'] = [query, psr_table]
+                    logging.debug(psr_table)
+                else:
+                    param_dict['Known Nearby Sources'] = str(None)
+                    logging.info('No known pulsars in the field')
+    else: #if skip_pointing
+        if len(row) > 0:
+            param_dict['S/N'] = float(row['snr'].values[0])
+            param_dict['Width (ms)'] = float(0.256* 2**row['width'].values[0])
+            param_dict['Width (samples)'] = int(2**row['width'].values[0])
+            param_dict['DM (pc/cc)'] = float(row['dm'].values[0])
+            param_dict['NE2001 DM (pc/cc)'] = 0
+            param_dict['YMW16 DM (pc/cc)'] = 0
+            param_dict['MJD'] = str(row['cand_mjd'].values[0])
+            param_dict['RA (J2000)'] = 0
+            param_dict['DEC (J2000)'] = 0
+            param_dict['GL (degree)'] = 0
+            param_dict['GB (degree)'] = 0
+            param_dict['Receiver'] = 0
+            param_dict['Project ID'] = 0
+            param_dict['Observation ID'] = str(folder)
+            param_dict['Turret Angle (degree)'] = 0
+            param_dict['Known Nearby Sources'] = str(None)
 
     return stuff_dict, param_dict
 
-def plotem(h5_file,fout=None,nrby=False):
+def plotem(h5_file,fout=None,nrby=False,skip_pointing=False):
     """
     Generates a plot from an h5 filename.
 
@@ -125,14 +145,15 @@ def plotem(h5_file,fout=None,nrby=False):
     h5_file (string) -- filename of h5 file
 
     Keyword arguments:
-    fout (string) -- filename of output file (default None)
-    nrby (bool)   -- change return type (default False)
+    fout (string)         -- filename of output file (default None)
+    nrby (bool)           -- change return type (default False)
+    skip_pointing (bool)  -- skip pointing data for test purposes (default False)
     
     Returns a string containing the file name of the generated plot if nrby is False
     Else, returns (string, bool) tuple with the same string and a boolean which is True if there is a known nearby source.
     """
 
-    stuff_dict, param_dict = h5_loction_2_stuff(h5_file)
+    stuff_dict, param_dict = h5_loction_2_stuff(h5_file, skip_pointing=skip_pointing)
     ts = np.linspace(-128,128,num=256)*.256*param_dict['Width (samples)']
 
     if ts[-1]//1000 > 0:

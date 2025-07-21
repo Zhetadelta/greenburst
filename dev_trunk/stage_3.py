@@ -38,11 +38,12 @@ def stage_initer(values):
     
     channel.start_consuming()
 
-def process_file(file_name):
+def process_file(file_name, skip_pointing=False):
     try:
-        if processh5File(file_name, None): #source with matching DM found
-            logging.info(f"Existing source found for file {file_name}")
-        fout, known_src = plotem(file_name, nrby=True) #modified: get nearby source info
+        if not skip_pointing:
+            if processh5File(file_name, None): #source with matching DM found
+                logging.info(f"Existing source found for file {file_name}")
+        fout, known_src = plotem(file_name, nrby=True, skip_pointing=skip_pointing) #modified: get nearby source info
         file_name=fout.split('/')[-1][:-3]
         with open(fout, 'rb') as f:
             data = f.read()
@@ -63,11 +64,11 @@ def begin_main(values):
     TOKEN = data_loaded['dropbox']['token']
     dbx = dropbox.Dropbox(TOKEN)
     if values.file is not None:
-        process_file(values.file)
+        process_file(values.file, values.test)
     else:
         with open(values.filelist, "r") as file:
             for fname in file.readlines():
-                process_file(fname[:-1]) #strip the newline
+                process_file(fname[:-1], values.test) #strip the newline
     return None
 
 
@@ -77,10 +78,12 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--daemon', dest='daemon', action='store_false', help='Run with AMQP')
     parser.add_argument('-f', '--file', nargs='+')
     parser.add_argument('-F', '--filelist', type=str, help="file containing list of stage 2 outputs")
+    parser.add_argument('-t', '--test', action="store_true", help="Skip pointing data and database, and just plot cands")
     parser.set_defaults(file=None)
     parser.set_defaults(filelist=None)
     parser.set_defaults(verbose=False)
     parser.set_defaults(daemon=True)
+    parser.set_defaults(test=False)
     values = parser.parse_args()
 
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
