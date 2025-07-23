@@ -61,12 +61,14 @@ def process_file(file_name, skip_pointing=False):
 def begin_main(values):
     with open("config/conf.yaml", 'r') as stream:
         data_loaded = yaml.load(stream)
-    TOKEN = data_loaded['dropbox']['token']
-    dbx = dropbox.Dropbox(TOKEN)
     if values.file is not None:
+        TOKEN = data_loaded['dropbox']['token']
+        dbx = dropbox.Dropbox(TOKEN)
         process_file(values.file, values.test)
     else:
         with open(values.filelist, "r") as file:
+            TOKEN = data_loaded['dropbox']['token']
+            dbx = dropbox.Dropbox(TOKEN)
             for fname in file.readlines():
                 process_file(fname[:-1], values.test) #strip the newline
     return None
