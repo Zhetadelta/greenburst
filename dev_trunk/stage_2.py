@@ -88,8 +88,11 @@ def begin_main(values):
 
     base_work_dir = "/ldata/trunk"
     folder = files.split("/")[-2]
-
-    fil_file = glob.glob(f"{base_work_dir}/{folder}/*jb_4096.fil")[0]
+    try:
+        fil_file = glob.glob(f"{base_work_dir}/{folder}/*jb_4096.fil")[0]
+    except AttributeError:
+        logger.warning("Jess output has bad header! Reading from original filterbank.")
+        fil_file = glob.glob(f"{base_work_dir}/{folder}/{folder}.fil")[0]
     if len(cand_lists) != 0:
         cand_df = pd.concat(cand_lists, ignore_index=True)
         mask_thresholds = (
