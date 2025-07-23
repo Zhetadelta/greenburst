@@ -88,11 +88,7 @@ def begin_main(values):
 
     base_work_dir = "/ldata/trunk"
     folder = files.split("/")[-2]
-    try:
-        fil_file = glob.glob(f"{base_work_dir}/{folder}/*jb_4096.fil")[0]
-    except AttributeError:
-        logger.warning("Jess output has bad header! Reading from original filterbank.")
-        fil_file = glob.glob(f"{base_work_dir}/{folder}/{folder}.fil")[0]
+    fil_file = glob.glob(f"{base_work_dir}/{folder}/*jb_4096.fil")[0]
     if len(cand_lists) != 0:
         cand_df = pd.concat(cand_lists, ignore_index=True)
         mask_thresholds = (
@@ -102,8 +98,12 @@ def begin_main(values):
             & (cand_df["dm"] > values.dm)
             & (cand_df["width"] <= values.width)
         )
-
-        fil_obj = pysigproc.SigprocFile(fp=fil_file)
+        try:
+            fil_obj = pysigproc.SigprocFile(fp=fil_file)
+        except AttributeError:
+            logger.warning("Jess output has bad header! Reading from original filterbank.")
+            fil_file = glob.glob(f"{base_work_dir}/{folder}/{folder}.fil")[0]
+            fil_obj = pysigproc.SigprocFile(fp=fil_file)
         mjd = fil_obj.tstart
         if len(cand_df[mask_thresholds]) > 0:
             influx_df = mjd2influx(mjd)
