@@ -154,6 +154,12 @@ def plotem(h5_file,fout=None,nrby=False,skip_pointing=False):
     """
 
     stuff_dict, param_dict = h5_loction_2_stuff(h5_file, skip_pointing=skip_pointing)
+    #if skip_pointing, it's a test run so we should write out some of the metadata for checking
+    if skip_pointing:
+        with open("/ldata/dev_tests/repro/plotOut.txt", "a") as file:
+            file.write(f"{str(round(param_dict['DM (pc/cc)'])).ljust(6)} pc/cc {str(round(param_dict['Width (ms)']/(1000),3))} s {h5_file.split('/')[3]}\n")
+    #this writes DM, pulse width, and filename to plotOut.txt in a format similar to injection script
+
     ts = np.linspace(-128,128,num=256)*.256*param_dict['Width (samples)']
 
     if ts[-1]//1000 > 0:
