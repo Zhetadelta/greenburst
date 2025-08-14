@@ -135,6 +135,9 @@ def begin_main(values):
                 kill_mask = glob.glob(f"{base_work_dir}/{folder}/*.flag")
                 cand_df_masked.loc[:, "fil_file"] = fil_file
                 cand_df_masked.loc[:, "kill_mask"] = kill_mask[0]
+                with open("/ldata/dev_tests/repro/preFetchOUT.txt", "a") as file:
+                    for _, row in cand_df_masked.iterrows():
+                        file.write(f"{str(round(row['dm'])).ljust(6)} pc/cc {str(round(row['width']/(1000),3))} s {row['fil_file']}\n")
                 cand_df_masked.plot(
                     "tcand",
                     "dm",
