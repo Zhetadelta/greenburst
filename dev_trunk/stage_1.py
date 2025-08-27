@@ -184,7 +184,8 @@ def begin_main(values):
 
         heimdall_command = (
             f"heimdall -nsamps_gulp 524288 -dm 10 10000 -boxcar_max 4096 -cand_sep_dm_trial 200 -cand_sep_time 128 -cand_sep_filter 3"
-            + " -rfi_no_broad"  #  -rfi_no_narrow
+            + " -rfi_no_broad"
+            + " -rfi_no_narrow"
             + " -output_dir {}".format(out_dir)
             + " -f {}".format(clean_fil_path)
         )
