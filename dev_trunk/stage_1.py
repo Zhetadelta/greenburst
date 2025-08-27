@@ -174,13 +174,16 @@ def begin_main(values):
         new_fil_path = f"{out_dir}{filterbank_name}.fil"
         clean_fil_path = f"{out_dir}{filterbank_name}_jb_4096.fil"
 
+        #Let's skip jess for testing purposes.
         jess_command = (
             "time /sdata/miniconda/envs/py38/bin/python /opt/soft/jess/bin/jess_gauss.py"
             + " -test jarque_bera -spb 4096 -mtz 1.5"
             + f" -f {new_fil_path} -o {clean_fil_path}"
         )
-        logging.info(f"Running {jess_command}")
-        send2gpuQ(jess_command)
+        #logging.info(f"Running {jess_command}")
+        #send2gpuQ(jess_command)
+        logging.warn("Skipping jess filtering!")
+        _cmdline(f"cp {new_fil_path} {clean_fil_path}")
 
         heimdall_command = (
             f"heimdall -nsamps_gulp 524288 -dm 10 10000 -boxcar_max 4096 -cand_sep_dm_trial 200 -cand_sep_time 128 -cand_sep_filter 3"
