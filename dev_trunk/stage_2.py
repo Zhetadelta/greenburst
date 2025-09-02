@@ -238,7 +238,7 @@ if __name__ == "__main__":
         default=8.0,
     )
     parser.add_argument(
-        "-w", "--width", type=int, help="log 2 width of the candidates", default=7
+        "-w", "--width", type=int, help="log 2 width of the candidates", default=12
     )
     parser.add_argument(
         "-D", "--dm", type=float, help="minimum DM to look out for", default=20
