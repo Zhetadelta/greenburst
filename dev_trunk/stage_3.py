@@ -7,7 +7,7 @@ import pika
 import pandas as pd
 from pika_send import send2Q
 from plot_cand import plotem
-import dropbox
+import dropbox as dbx
 import yaml
 import re
 from slack_send import send_img_2_slack
@@ -39,7 +39,7 @@ def stage_initer(values):
     channel.start_consuming()
 
 def process_file(file_name, skip_pointing=False):
-    #try:
+    try:
     if not skip_pointing:
         if processh5File(file_name, None): #source with matching DM found
             logging.info(f"Existing source found for file {file_name}")
@@ -58,8 +58,8 @@ def process_file(file_name, skip_pointing=False):
         logging.info(send_img_2_slack(slack_send_url, nrby=known_src))
     else: #if test mode
         logging.info(f'Created png at {fout}')
-    #except Exception as error:
-        #logging.warning(f"Encountered {error} while processing file {file_name}")
+    except Exception as error:
+        logging.warning(f"Encountered {error} while processing file {file_name}")
 
 def begin_main(values):
     with open("config/conf.yaml", 'r') as stream:
