@@ -108,14 +108,14 @@ def h5_loction_2_stuff(h5_file, csv_path = None, skip_pointing = False):
             param_dict['Project ID'] = str(row['SCPROJID'].values[0])
             param_dict['Observation ID'] = str(folder)
             param_dict['Turret Angle (degree)'] = float(row['ATRXOCTA'].values[0])
-            if np.min([param_dict['NE2001 DM (pc/cc)'], param_dict['YMW16 DM (pc/cc)']]) > param_dict['DM (pc/cc)']:
-                query, psr_table = qpsr(float(row['RA_deg'].values[0]), float(row['DEC_deg'].values[0]))
-                if len(psr_table) > 0:
-                    param_dict['Known Nearby Sources'] = [query, psr_table]
-                    logging.debug(psr_table)
-                else:
-                    param_dict['Known Nearby Sources'] = str(None)
-                    logging.info('No known pulsars in the field')
+            #if np.min([param_dict['NE2001 DM (pc/cc)'], param_dict['YMW16 DM (pc/cc)']]) > param_dict['DM (pc/cc)']:
+            query, psr_table = qpsr(float(row['RA_deg'].values[0]), float(row['DEC_deg'].values[0]))
+            if len(psr_table) > 0:
+                param_dict['Known Nearby Sources'] = [query, psr_table]
+                logging.debug(psr_table)
+            else:
+                param_dict['Known Nearby Sources'] = str(None)
+                logging.info('No known pulsars in the field')
     else: #if skip_pointing
         if len(row) > 0:
             param_dict['S/N'] = float(row['snr'].values[0])
