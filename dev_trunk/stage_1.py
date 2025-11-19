@@ -170,7 +170,7 @@ def begin_main(values):
         filterbank_name = filterbank.split("/")[-1].split(".")[0]
         out_dir = "/ldata/trunk/{}/".format(filterbank_name)
         _cmdline("mkdir -p {}".format(out_dir))
-        _cmdline(f"cp {filterbank} {out_dir}/")
+        _cmdline(f"mv {filterbank} {out_dir}/")
         new_fil_path = f"{out_dir}{filterbank_name}.fil"
         clean_fil_path = f"{out_dir}{filterbank_name}_jb_4096.fil"
         
