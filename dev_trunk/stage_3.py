@@ -7,7 +7,7 @@ import pika
 import pandas as pd
 from pika_send import send2Q
 from plot_cand import plotem
-import dropbox as dbx
+import dropbox
 import yaml
 import re
 from slack_send import send_img_2_slack
@@ -38,7 +38,7 @@ def stage_initer(values):
     
     channel.start_consuming()
 
-def process_file(file_name, skip_pointing=False):
+def process_file(file_name, skip_pointing, dbx):
     try:
         if not skip_pointing:
             if processh5File(file_name, None): #source with matching DM found
@@ -67,11 +67,11 @@ def begin_main(values):
     TOKEN = data_loaded['dropbox']['token']
     dbx = dropbox.Dropbox(TOKEN)
     if values.file is not None:
-        process_file(values.file, values.test)
+        process_file(values.file, values.test, dbx)
     else:
         with open(values.filelist, "r") as file:
             for fname in file.readlines():
-                process_file(fname[:-1], values.test) #strip the newline
+                process_file(fname[:-1], values.test, dbx) #strip the newline
     return None
 
 
