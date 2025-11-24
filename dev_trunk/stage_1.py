@@ -134,7 +134,7 @@ def begin_main(values):
                 all_data_valid = df["DATA_VALID"].sum()
                 if all_data_valid < 33:
                     logging.info("Less than 33s of data is valid, skipping this file")
-                    #_cmdline(f"rm {filterbank}")
+                    _cmdline(f"rm {filterbank}")
                     return None
                 else:
                     es=Elasticsearch([{'host':'localhost','port':9200}])
