@@ -10,8 +10,9 @@ from plot_cand import plotem
 import dropbox
 import yaml
 import re
+from os import path
 from slack_send import send_img_2_slack
-from database import processh5File
+from database import processh5File, schema
 
 logger = logging.getLogger()
 format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -19,6 +20,8 @@ logging.getLogger('pika').setLevel(logging.INFO)
 
 __author__='Devansh Agarwal'
 __email__ = 'da0017@mix.wvu.edu'
+
+DB_FILE = path.join("","ldata","known_srcs.db")
 
 def stage_initer(values):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
@@ -41,7 +44,7 @@ def stage_initer(values):
 def process_file(file_name, skip_pointing, dbx):
     try:
         if not skip_pointing:
-            if processh5File(file_name, None): #source with matching DM found
+            if processh5File(file_name, None, DB_FILE): #source with matching DM found
                 logging.info(f"Existing source found for file {file_name}")
         fout, known_src = plotem(file_name, nrby=True, skip_pointing=skip_pointing) #modified: get nearby source info
         file_name=fout.split('/')[-1][:-3]
@@ -97,6 +100,7 @@ if __name__ == '__main__':
 
     if values.daemon:
         logging.info('Running in daemon mode')
+        schema(DB_FILE)
         stage_initer(values)
     else:
         if (values.file is None) and values.filelist is None:

@@ -136,7 +136,7 @@ def addRow(psr, ts=None, db=path.join(curdir,'test.db')):
     conn.close()
     return True
     
-def processh5File(h5File, csvPath):
+def processh5File(h5File, csvPath, db=path.join(curdir,'test.db')):
     """
     Given an h5 file, searches ATNF for a match and adds a row to database if one is found :3
 
@@ -155,7 +155,7 @@ def processh5File(h5File, csvPath):
     if not result: #nothing found
         logging.info('No known source in this region with this DM!')
         return False
-    return addRow(result, ts=params)
+    return addRow(result, ts=params, db=db)
     
 
 if __name__ == '__main__':
