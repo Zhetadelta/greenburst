@@ -21,7 +21,7 @@ logging.getLogger('pika').setLevel(logging.INFO)
 __author__='Devansh Agarwal'
 __email__ = 'da0017@mix.wvu.edu'
 
-DB_FILE = path.join("","ldata","known_srcs.db")
+DB_FILE = path.join("/","ldata","known_srcs.db")
 
 def stage_initer(values):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
