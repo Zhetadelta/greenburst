@@ -218,6 +218,10 @@ def plotem(h5_file,fout=None,nrby=False,skip_pointing=False):
     if fout is None:
         fout = h5_file[:-3]+'.png'
     plt.savefig(fout, bbox_inches='tight')
+    try:
+        plt.close() #to clean up memory usage
+    except:
+        pass
     if nrby: #return True as second part of tuple if known source nearby
         return (fout, param_dict['Known Nearby Sources'] != str(None))
     else: #old function output
