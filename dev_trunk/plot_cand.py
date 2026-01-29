@@ -117,9 +117,8 @@ def h5_loction_2_stuff(h5_file, csv_path = None, skip_pointing = False):
                 logging.debug(psr_table)
             else:
                 #10 degree filtered search; build filter then run it               
-                width = param_dict['Width (ms)']
                 DM = param_dict['DM (pc/cc)']
-                filterString = f"(W50 > {width*(0.8)} && W50 < {width*(1.2)}) && (DM > {DM*(0.8)} && DM < {DM*(1.2)})"
+                filterString = f"(DM > {DM*(0.8)} && DM < {DM*(1.2)})"
                 query, psr_table = qpsr(float(row['RA_deg'].values[0]), float(row['DEC_deg'].values[0]), condition=filterString, c=10)
                 if len(psr_table) > 0:
                     param_dict['Known Nearby Sources'] = [query, psr_table]
