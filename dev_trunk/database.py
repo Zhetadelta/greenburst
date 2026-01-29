@@ -101,7 +101,7 @@ def filteredSearch(ra, dec, epsilon=0.1, width=None, DM=None):
         print(qTable)
         return qTable[0]
     else: #try again with 10 degree field
-        query, qTable = qpsr(ra, dec, params = ['NAME','RAJ', 'DECJ', 'P0', 'DM', 'W50', 'W10', 'S1400', 'ASSOC'], condition=filterString, c=10)
+        query, qTable = qpsr(ra, dec, params = ['NAME','RAJ', 'DECJ', 'P0', 'DM', 'W50', 'W10', 'S1400', 'ASSOC'], condition=filterString, rad=10)
         qTable = query.table #reassign due to a hardcoded slice in original function
         logging.info(f"Sources found (10 degree field): {len(qTable)}")
         if len(qTable) > 0:

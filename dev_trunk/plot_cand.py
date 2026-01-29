@@ -122,7 +122,7 @@ def h5_loction_2_stuff(h5_file, csv_path = None, skip_pointing = False):
                 param_dict['Title'] = psr_table[0]['BNAME'] if isinstance(psr_table[0]['BNAME'],str) else psr_table[0]['JNAME']               
             else:
                 #10 degree filtered search              
-                query, psr_table = qpsr(float(row['RA_deg'].values[0]), float(row['DEC_deg'].values[0]), condition=filterString, c=10)
+                query, psr_table = qpsr(float(row['RA_deg'].values[0]), float(row['DEC_deg'].values[0]), condition=filterString, rad=10)
                 if len(psr_table) > 0:
                     param_dict['Known Nearby Sources'] = [query, psr_table]
                     param_dict['Title'] = psr_table[0]['BNAME'] if isinstance(psr_table[0]['BNAME'],str) else psr_table[0]['JNAME'] 
