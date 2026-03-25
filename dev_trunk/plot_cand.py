@@ -121,16 +121,9 @@ def h5_loction_2_stuff(h5_file, csv_path = None, skip_pointing = False):
                 query, psr_table = qpsr(float(row['RA_deg'].values[0]), float(row['DEC_deg'].values[0]), condition=filterString)
                 param_dict['Title'] = psr_table[0]['BNAME'] if isinstance(psr_table[0]['BNAME'],str) else psr_table[0]['JNAME']               
             else:
-                #10 degree filtered search              
-                query, psr_table = qpsr(float(row['RA_deg'].values[0]), float(row['DEC_deg'].values[0]), condition=filterString, rad=10)
-                if len(psr_table) > 0:
-                    param_dict['Known Nearby Sources'] = [query, psr_table]
-                    param_dict['Title'] = psr_table[0]['BNAME'] if isinstance(psr_table[0]['BNAME'],str) else psr_table[0]['JNAME'] 
-                    logging.debug(psr_table)
-                else:
-                    param_dict['Known Nearby Sources'] = str(None)
-                    param_dict['Title'] = "Unknown"
-                    logging.info('No known pulsars in the field')
+                param_dict['Known Nearby Sources'] = str(None)
+                param_dict['Title'] = "Unknown"
+                logging.info('No known pulsars in the field')
     else: #if skip_pointing
         if len(row) > 0:
             param_dict['S/N'] = float(row['snr'].values[0])
